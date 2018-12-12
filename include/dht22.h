@@ -18,12 +18,12 @@
 
 #define DHT_DATA_SIZE	40
 #define DHT_ONE_US		70
+#define DHT_ZERO_US		30
 
 
 typedef struct {
 	int16_t temperature;
 	int16_t humidity;
-	//uint8_t	checksum;
 } dht_result_t;
 
 

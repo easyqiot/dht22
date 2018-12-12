@@ -22,6 +22,9 @@
 
 
 #define VERSION				"0.1.0"
+#define HUMIDIFIER_QUEUE	"humidifier"
+#define HUMIDITY_MIN		270
+#define HUMIDITY_MAX		300
 
 
 LOCAL EasyQSession eq;
@@ -30,11 +33,21 @@ LOCAL uint32_t ticks = 0;
 
 
 void dht_result(dht_result_t * result) {
+	ticks++;
+	if (ticks % 10 == 0) {
+		if (result->humidity < HUMIDITY_MIN) {
+			easyq_push(&eq, HUMIDIFIER_QUEUE, "on");
+			return;
+		}
+		else if (result->humidity > HUMIDITY_MAX) {
+			easyq_push(&eq, HUMIDIFIER_QUEUE, "off");
+			return;
+		}
+	}
 	char str[32];
 	os_sprintf(str, "(%d) H: %d, T: %d", ticks, result->humidity, 
 			result->temperature);
 	easyq_push(&eq, DHT_STATUS_QUEUE, str);
-	ticks++;
 }
 
 
