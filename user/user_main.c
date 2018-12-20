@@ -23,8 +23,8 @@
 
 #define VERSION				"0.1.0"
 #define HUMIDIFIER_QUEUE	"humidifier"
-#define HUMIDITY_MIN		270
-#define HUMIDITY_MAX		300
+#define HUMIDITY_MIN		400
+#define HUMIDITY_MAX		450
 
 
 LOCAL EasyQSession eq;
