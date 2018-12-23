@@ -3,6 +3,7 @@
 #include "partition.h"
 #include "wifi.h"
 #include "config.h"
+#include "io_config.h"
 #include "dht22.h"
 
 // SDK
@@ -25,6 +26,7 @@
 #define HUMIDIFIER_QUEUE	"humidifier"
 #define HUMIDITY_MIN		400
 #define HUMIDITY_MAX		450
+#define DHT_INTERVAL_MS		10000
 
 
 LOCAL EasyQSession eq;
@@ -34,7 +36,16 @@ LOCAL uint32_t ticks = 0;
 
 void dht_result(dht_result_t * result) {
 	ticks++;
-	if (ticks % 10 == 0) {
+	char str[32];
+	os_sprintf(str, "H%2d.%d T%2d.%d ", 
+			result->humidity / 10,
+			result->humidity % 10,
+			result->temperature / 10,
+			result->temperature % 10
+		);
+	carousel_start(str, 12);
+	easyq_push(&eq, DHT_STATUS_QUEUE, str);
+	if (ticks % 2 == 0) {
 		if (result->humidity < HUMIDITY_MIN) {
 			easyq_push(&eq, HUMIDIFIER_QUEUE, "on");
 			return;
@@ -44,10 +55,6 @@ void dht_result(dht_result_t * result) {
 			return;
 		}
 	}
-	char str[32];
-	os_sprintf(str, "(%d) H: %d, T: %d", ticks, result->humidity, 
-			result->temperature);
-	easyq_push(&eq, DHT_STATUS_QUEUE, str);
 }
 
 
@@ -68,6 +75,7 @@ fota_report_status(const char *q) {
 
 void ICACHE_FLASH_ATTR
 dht_report_status(void *args) {
+	carousel_start("*?", 2);
 	dht_read();
 }
 
@@ -166,8 +174,9 @@ void user_init(void) {
 	eq.onmessage = easyq_message_cb;
 	
 	dht_register_callback(dht_result);
+	display_init();
 	dht_init();
-
+	carousel_start("Hi", 2);
 	//motor_init();
     WIFI_Connect(WIFI_SSID, WIFI_PSK, wifi_connect_cb);
     INFO("System started ...\r\n");

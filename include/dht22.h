@@ -13,7 +13,6 @@
 #define DHT_MUX			PERIPHS_IO_MUX_GPIO4_U
 #define DHT_NUM			4
 #define DHT_FUNC		FUNC_GPIO4
-#define DHT_INTERVAL_MS	3000
 
 
 #define DHT_DATA_SIZE	40

@@ -68,16 +68,16 @@ LINKFLAGS_eagle.app.v6 = \
 	-lwpa	\
 	-lcrypto	\
 	-lmain	\
+	-ljson	\
 	-lupgrade\
-	-ldriver \
+	-lmbedtls	\
 	-lpwm	\
+	-ldriver \
+	-lsmartconfig \
 	-lhal					\
 	$(DEP_LIBS_eagle.app.v6)					\
 	-Wl,--end-group
 
-#	-ljson	\
-#	-lmbedtls	\
-#	-lsmartconfig \
 	
 DEPENDS_eagle.app.v6 = \
                 $(LD_FILE) \
@@ -132,6 +132,7 @@ sinclude $(PDIR)Makefile
 
 ESPTOOL = esptool.py --baud 576000 write_flash -u --flash_size 1MB --flash_mode qio --flash_freq 40m
 FOTATOOL = ~/.virtualenvs/easyq/bin/python ../fota/fota.py
+
 flash:
 	 $(ESPTOOL) \
 		0x0 	../bin/boot_v1.7.bin \
@@ -152,5 +153,22 @@ flash_erase:
 fota: 
 	$(FOTATOOL) \
 		../bin/upgrade/user2.1024.new.2.bin dht ha:1085 \
-		-b 192.168.8.214:6666
+		-b 192.168.5.90:6666
+
+
+fota_map2_user2:
+	make clean
+	make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=40 SPI_MODE=QIO SPI_SIZE_MAP=2
+	$(FOTATOOL) \
+		../bin/upgrade/user2.1024.new.2.bin dht ha:1085 \
+		-b 192.168.5.90:6666
+
+
+fota_map3_user2:
+	make clean
+	make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=40 SPI_MODE=QIO SPI_SIZE_MAP=3
+	$(FOTATOOL) \
+		../bin/upgrade/user2.2048.new.3.bin dht ha:1085 \
+		-b 192.168.5.90:6666
+
 
